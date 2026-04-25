@@ -1,400 +1,709 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Report a Lost Item — NIET Lost & Found</title>
-  <meta name="description" content="Report an item you've lost on NIET campus. Our staff will try to match it with found items.">
-  <meta name="theme-color" content="#0f172a">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
-  <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-
-  <!-- ========= HEADER ========= -->
-  <header class="header" role="banner">
-    <div class="header__inner">
-      <a href="index.html" class="header__brand">
-        <div class="header__logo">LF</div>
-        <div>
-          <div class="header__title">Lost & Found</div>
-          <div class="header__subtitle">NIET College</div>
-        </div>
-      </a>
-      <button class="header__menu-btn" id="menu-toggle" aria-label="Toggle menu">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <nav class="header__nav" id="header-nav">
-        <a href="index.html" class="header__link">Browse Items</a>
-        <a href="report.html" class="header__link header__link--active">Report Lost</a>
-        <a href="admin.html" class="header__link header__link--admin">Admin</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- ========= REPORT FORM ========= -->
-  <main class="report-page">
-    <div class="report-page__inner">
-
-      <div class="report-page__header">
-        <div class="report-page__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            <line x1="11" y1="8" x2="11" y2="14"/><line x1="11" y1="16" x2="11.01" y2="16"/>
-          </svg>
-        </div>
-        <h1>Report a Lost Item</h1>
-        <p class="text-muted">Fill out this form to report something you've lost on campus. Our staff will try to match it with found items and contact you.</p>
-      </div>
-
-      <form id="report-form" class="report-form" novalidate>
-        <div class="report-form__section">
-          <h3 class="report-form__section-title">Your Details</h3>
-          <div class="admin-form-grid">
-            <div class="form-group">
-              <label class="form-group__label" for="report-name">Full Name <span style="color:var(--danger)">*</span></label>
-              <input type="text" id="report-name" class="form-input" placeholder="Your full name" required minlength="2" maxlength="100">
-            </div>
-            <div class="form-group">
-              <label class="form-group__label" for="report-email">Email Address <span style="color:var(--danger)">*</span></label>
-              <input type="email" id="report-email" class="form-input" placeholder="your.email@niet.co.in" required>
-            </div>
-            <div class="form-group">
-              <label class="form-group__label" for="report-phone">Phone Number <span style="color:var(--danger)">*</span></label>
-              <input type="tel" id="report-phone" class="form-input" placeholder="10-digit mobile number" required pattern="[6-9][0-9]{9}" maxlength="10">
-              <p class="form-group__hint">Indian mobile number (e.g., 9876543210)</p>
-            </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report a Lost Item — NIET Lost & Found</title>
+    <meta
+      name="description"
+      content="Report an item you've lost on NIET campus. Our staff will try to match it with found items."
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- ========= HEADER ========= -->
+    <header class="header" role="banner">
+      <div class="header__inner">
+        <a href="index.html" class="header__brand" data-aos="fade-right">
+          <div class="header__logo"><img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7HH5Uw4IrldkqC7Z5h0_OQSg-dQ9TnnPNtw&s"
+              alt=""
+            /></div>
+          <div>
+            <div class="header__title">Lost & Found</div>
+            <div class="header__subtitle">NIET College</div>
           </div>
+        </a>
+
+        <div class="header__actions">
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            aria-label="Toggle dark mode"
+          >
+            <svg
+              class="sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            <svg
+              class="moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </button>
+
+          <button
+            class="header__menu-btn"
+            id="menu-toggle"
+            aria-label="Toggle menu"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
         </div>
 
-        <div class="report-form__divider"></div>
+        <nav class="header__nav" id="header-nav" data-aos="fade-left">
+          <div class="header__nav-header">
+            <span class="header__nav-title">Menu</span>
+          </div>
+          <a href="index.html" class="header__link">
+            <span class="material-symbols-outlined">grid_view</span>
+            Browse Items
+          </a>
+          <a href="report.html" class="header__link header__link--active">
+            <span class="material-symbols-outlined">add_circle</span>
+            Report Found
+          </a>
+          <a href="admin.html" class="header__link header__link--admin">
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+            Admin Portal
+          </a>
+          <div class="header__nav-footer">
+            <p>© 2026 NIET Lost & Found</p>
+          </div>
+        </nav>
+      </div>
+    </header>
 
-        <div class="report-form__section">
-          <h3 class="report-form__section-title">Item Information</h3>
-          <div class="admin-form-grid">
-            <div class="form-group form-group--full">
-              <label class="form-group__label" for="report-item-title">Item Name / Title <span style="color:var(--danger)">*</span></label>
-              <input type="text" id="report-item-title" class="form-input" placeholder="e.g., Blue JBL Earbuds, Black Wallet" required maxlength="200">
-            </div>
+    <!-- ========= REPORT FORM ========= -->
+    <main class="report-page">
+      <div class="report-page__inner">
+        <div class="report-page__header" data-aos="fade-up">
+          <div class="report-page__icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              width="40"
+              height="40"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <line x1="11" y1="8" x2="11" y2="14" />
+              <line x1="11" y1="16" x2="11.01" y2="16" />
+            </svg>
+          </div>
+          <h1>Report a Lost Item</h1>
+          <p class="text-muted">
+            Fill out this form to report something you've lost on campus. Our
+            staff will try to match it with found items and contact you.
+          </p>
+        </div>
 
-            <div class="form-group">
-              <label class="form-group__label" for="report-category">Category <span style="color:var(--danger)">*</span></label>
-              <select id="report-category" class="form-select" required>
-                <option value="" disabled selected>Select category</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-group__label" for="report-location">Last Seen Location <span style="color:var(--danger)">*</span></label>
-              <select id="report-location" class="form-select" required>
-                <option value="" disabled selected>Select location</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-group__label" for="report-date">Date Lost <span style="color:var(--danger)">*</span></label>
-              <input type="date" id="report-date" class="form-input" required>
-            </div>
-
-            <div class="form-group form-group--full">
-              <label class="form-group__label" for="report-description">Description <span style="color:var(--danger)">*</span></label>
-              <textarea id="report-description" class="form-textarea" placeholder="Describe the item in detail — color, brand, size, any distinguishing marks or contents..." required minlength="20" maxlength="1000"></textarea>
-              <p class="form-group__hint">Minimum 20 characters. The more detail you provide, the easier it is to match.</p>
-            </div>
-
-            <div class="form-group form-group--full">
-              <label class="form-group__label">Item Photo (optional)</label>
-              <div class="file-upload" id="report-file-upload">
-                <div class="file-upload__icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                </div>
-                <p class="file-upload__text"><strong>Click to upload</strong> a reference photo</p>
-                <p class="file-upload__hint">PNG, JPG up to 5MB — upload a photo of the item or a similar one</p>
-                <input type="file" id="report-image" accept="image/png,image/jpeg,image/webp">
-                <div class="file-upload__preview" id="report-image-preview"></div>
+        <form
+          id="report-form"
+          class="report-form"
+          novalidate
+          data-aos="fade-up"
+          data-aos-delay="100"
+        >
+          <div class="report-form__section">
+            <h3 class="report-form__section-title">Your Details</h3>
+            <div class="admin-form-grid">
+              <div class="form-group">
+                <label class="form-group__label" for="report-name"
+                  >Full Name <span style="color: var(--danger)">*</span></label
+                >
+                <input
+                  type="text"
+                  id="report-name"
+                  class="form-input"
+                  placeholder="Your full name"
+                  required
+                  minlength="2"
+                  maxlength="100"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-group__label" for="report-email"
+                  >Email Address
+                  <span style="color: var(--danger)">*</span></label
+                >
+                <input
+                  type="email"
+                  id="report-email"
+                  class="form-input"
+                  placeholder="your.email@niet.co.in"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-group__label" for="report-phone"
+                  >Phone Number
+                  <span style="color: var(--danger)">*</span></label
+                >
+                <input
+                  type="tel"
+                  id="report-phone"
+                  class="form-input"
+                  placeholder="10-digit mobile number"
+                  required
+                  pattern="[6-9][0-9]{9}"
+                  maxlength="10"
+                />
+                <p class="form-group__hint">
+                  Indian mobile number (e.g., 9876543210)
+                </p>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="report-form__actions">
-          <button type="submit" class="btn btn--primary btn--lg" id="report-submit-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <div class="report-form__divider"></div>
+
+          <div class="report-form__section">
+            <h3 class="report-form__section-title">Item Information</h3>
+            <div class="admin-form-grid">
+              <div class="form-group form-group--full">
+                <label class="form-group__label" for="report-item-title"
+                  >Item Name / Title
+                  <span style="color: var(--danger)">*</span></label
+                >
+                <input
+                  type="text"
+                  id="report-item-title"
+                  class="form-input"
+                  placeholder="e.g., Blue JBL Earbuds, Black Wallet"
+                  required
+                  maxlength="200"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-group__label" for="report-category"
+                  >Category <span style="color: var(--danger)">*</span></label
+                >
+                <select id="report-category" class="form-select" required>
+                  <option value="" disabled selected>Select category</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-group__label" for="report-location"
+                  >Last Seen Location
+                  <span style="color: var(--danger)">*</span></label
+                >
+                <select id="report-location" class="form-select" required>
+                  <option value="" disabled selected>Select location</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-group__label" for="report-date"
+                  >Date Lost <span style="color: var(--danger)">*</span></label
+                >
+                <input
+                  type="date"
+                  id="report-date"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group form-group--full">
+                <label class="form-group__label" for="report-description"
+                  >Description
+                  <span style="color: var(--danger)">*</span></label
+                >
+                <textarea
+                  id="report-description"
+                  class="form-textarea"
+                  placeholder="Describe the item in detail — color, brand, size, any distinguishing marks or contents..."
+                  required
+                  minlength="20"
+                  maxlength="1000"
+                ></textarea>
+                <p class="form-group__hint">
+                  Minimum 20 characters. The more detail you provide, the easier
+                  it is to match.
+                </p>
+              </div>
+
+              <div class="form-group form-group--full">
+                <label class="form-group__label">Item Photo (optional)</label>
+                <div class="file-upload" id="report-file-upload">
+                  <div class="file-upload__icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="32"
+                      height="32"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <p class="file-upload__text">
+                    <strong>Click to upload</strong> a reference photo
+                  </p>
+                  <p class="file-upload__hint">
+                    PNG, JPG up to 5MB — upload a photo of the item or a similar
+                    one
+                  </p>
+                  <input
+                    type="file"
+                    id="report-image"
+                    accept="image/png,image/jpeg,image/webp"
+                  />
+                  <div
+                    class="file-upload__preview"
+                    id="report-image-preview"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-form__actions">
+            <button
+              type="submit"
+              class="btn btn--primary btn--lg"
+              id="report-submit-btn"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                width="20"
+                height="20"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Submit Report
+            </button>
+            <p
+              class="form-group__hint"
+              style="text-align: center; margin-top: 12px"
+            >
+              Your contact details will only be visible to campus staff.
+            </p>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- ========= SUCCESS MODAL ========= -->
+    <div class="modal-overlay" id="report-success-modal">
+      <div class="modal" style="text-align: center; max-width: 420px">
+        <div class="modal__body" style="padding: 40px 32px">
+          <div
+            style="
+              width: 64px;
+              height: 64px;
+              border-radius: 50%;
+              background: var(--success-bg);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 20px;
+            "
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--success)"
+              stroke-width="2.5"
+              width="32"
+              height="32"
+            >
+              <polyline points="20 6 9 17 4 12" />
             </svg>
-            Submit Report
-          </button>
-          <p class="form-group__hint" style="text-align:center;margin-top:12px">Your contact details will only be visible to campus staff.</p>
-        </div>
-      </form>
-    </div>
-  </main>
-
-  <!-- ========= SUCCESS MODAL ========= -->
-  <div class="modal-overlay" id="report-success-modal">
-    <div class="modal" style="text-align:center;max-width:420px">
-      <div class="modal__body" style="padding:40px 32px">
-        <div style="width:64px;height:64px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" width="32" height="32"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <h2 style="margin-bottom:12px">Report Submitted!</h2>
-        <p class="text-muted" style="font-size:0.9rem;margin-bottom:24px">Your lost item report has been recorded. Our staff will check for matches among found items and contact you if there's a match.</p>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-          <a href="index.html" class="btn btn--primary">Browse Found Items</a>
-          <button class="btn btn--outline" id="report-another-btn">Report Another</button>
+          </div>
+          <h2 style="margin-bottom: 12px">Report Submitted!</h2>
+          <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 24px">
+            Your lost item report has been recorded. Our staff will check for
+            matches among found items and contact you if there's a match.
+          </p>
+          <div
+            style="
+              display: flex;
+              gap: 12px;
+              justify-content: center;
+              flex-wrap: wrap;
+            "
+          >
+            <a href="index.html" class="btn btn--primary">Browse Found Items</a>
+            <button class="btn btn--outline" id="report-another-btn">
+              Report Another
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ========= FOOTER ========= -->
-  <footer class="footer">
-    <div class="footer__inner">
-      <div class="footer__brand">NIET Lost & Found</div>
-      <p class="footer__text">Noida Institute of Engineering & Technology</p>
-      <div class="footer__divider"></div>
-      <p class="footer__copy">&copy; 2026 NIET College. Built for the campus community.</p>
-    </div>
-  </footer>
+    <!-- ========= FOOTER ========= -->
+    <footer class="footer">
+      <div class="footer__inner">
+        <div class="footer__brand">NIET Lost & Found</div>
+        <p class="footer__text">Noida Institute of Engineering & Technology</p>
+        <div class="footer__divider"></div>
+        <p class="footer__copy">
+          &copy; 2026 NIET College. Built for the campus community.
+        </p>
+      </div>
+    </footer>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
-  <!-- App Scripts -->
-  <script src="js/firebase.js"></script>
+    <!-- App Scripts -->
+    <script src="js/firebase.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-  <!-- Page-specific logic -->
-  <script>
-    (function () {
-      'use strict';
+    <!-- Page-specific logic -->
+    <script>
+      (function () {
+        "use strict";
 
-      document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener("DOMContentLoaded", init);
 
-      function init() {
-        setupMobileMenu();
-        populateDropdowns();
-        bindFileUpload();
-        bindFormSubmit();
-        setDefaultDate();
-      }
+        function init() {
+          setupTheme();
+          setupHeaderScroll();
+          setupMobileMenu();
+          populateDropdowns();
+          bindFileUpload();
+          bindFormSubmit();
+          setDefaultDate();
 
-      function populateDropdowns() {
-        const catSelect = document.getElementById('report-category');
-        const locSelect = document.getElementById('report-location');
-
-        if (catSelect) {
-          Utils.categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat;
-            opt.textContent = cat;
-            catSelect.appendChild(opt);
+          // Initialize AOS
+          AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50,
           });
         }
 
-        if (locSelect) {
-          Utils.locations.forEach(loc => {
-            const opt = document.createElement('option');
-            opt.value = loc;
-            opt.textContent = loc;
-            locSelect.appendChild(opt);
+        function setupTheme() {
+          const btn = document.getElementById("theme-toggle");
+          if (!btn) return;
+          const currentTheme = localStorage.getItem("theme") || "light";
+          document.documentElement.setAttribute("data-theme", currentTheme);
+          btn.addEventListener("click", () => {
+            const theme =
+              document.documentElement.getAttribute("data-theme") === "dark"
+                ? "light"
+                : "dark";
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
           });
         }
-      }
 
-      function setDefaultDate() {
-        const dateInput = document.getElementById('report-date');
-        if (dateInput) {
-          dateInput.value = new Date().toISOString().split('T')[0];
-          dateInput.max = new Date().toISOString().split('T')[0];
+        function setupHeaderScroll() {
+          const header = document.querySelector(".header");
+          if (!header) return;
+          window.addEventListener("scroll", () => {
+            if (window.scrollY > 20) {
+              header.classList.add("header--scrolled");
+            } else {
+              header.classList.remove("header--scrolled");
+            }
+          });
         }
-      }
 
-      function bindFileUpload() {
-        const uploadArea = document.getElementById('report-file-upload');
-        const fileInput = document.getElementById('report-image');
-        const preview = document.getElementById('report-image-preview');
+        function populateDropdowns() {
+          const catSelect = document.getElementById("report-category");
+          const locSelect = document.getElementById("report-location");
 
-        if (!uploadArea || !fileInput) return;
+          if (catSelect) {
+            Utils.categories.forEach((cat) => {
+              const opt = document.createElement("option");
+              opt.value = cat;
+              opt.textContent = cat;
+              catSelect.appendChild(opt);
+            });
+          }
 
-        uploadArea.addEventListener('click', () => fileInput.click());
+          if (locSelect) {
+            Utils.locations.forEach((loc) => {
+              const opt = document.createElement("option");
+              opt.value = loc;
+              opt.textContent = loc;
+              locSelect.appendChild(opt);
+            });
+          }
+        }
 
-        fileInput.addEventListener('change', () => {
-          const file = fileInput.files[0];
-          if (file && preview) {
-            if (file.size > 5 * 1024 * 1024) {
-              Toast.error('File too large', 'Please upload an image under 5MB.');
-              fileInput.value = '';
+        function setDefaultDate() {
+          const dateInput = document.getElementById("report-date");
+          if (dateInput) {
+            dateInput.value = new Date().toISOString().split("T")[0];
+            dateInput.max = new Date().toISOString().split("T")[0];
+          }
+        }
+
+        function bindFileUpload() {
+          const uploadArea = document.getElementById("report-file-upload");
+          const fileInput = document.getElementById("report-image");
+          const preview = document.getElementById("report-image-preview");
+
+          if (!uploadArea || !fileInput) return;
+
+          uploadArea.addEventListener("click", () => fileInput.click());
+
+          fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+            if (file && preview) {
+              if (file.size > 5 * 1024 * 1024) {
+                Toast.error(
+                  "File too large",
+                  "Please upload an image under 5MB.",
+                );
+                fileInput.value = "";
+                return;
+              }
+              const reader = new FileReader();
+              reader.onload = (ev) => {
+                preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+                preview.classList.add("active");
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+
+          // Drag and drop
+          uploadArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = "var(--secondary)";
+            uploadArea.style.background = "var(--info-bg)";
+          });
+
+          uploadArea.addEventListener("dragleave", () => {
+            uploadArea.style.borderColor = "";
+            uploadArea.style.background = "";
+          });
+
+          uploadArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = "";
+            uploadArea.style.background = "";
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith("image/")) {
+              const dt = new DataTransfer();
+              dt.items.add(file);
+              fileInput.files = dt.files;
+              fileInput.dispatchEvent(new Event("change"));
+            }
+          });
+        }
+
+        function bindFormSubmit() {
+          const form = document.getElementById("report-form");
+          const successModal = document.getElementById("report-success-modal");
+          const reportAnotherBtn =
+            document.getElementById("report-another-btn");
+
+          if (!form) return;
+
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById("report-submit-btn");
+            const name = document.getElementById("report-name").value.trim();
+            const email = document.getElementById("report-email").value.trim();
+            const phone = document.getElementById("report-phone").value.trim();
+            const itemTitle = document
+              .getElementById("report-item-title")
+              .value.trim();
+            const description = document
+              .getElementById("report-description")
+              .value.trim();
+            const category = document.getElementById("report-category").value;
+            const location = document.getElementById("report-location").value;
+            const dateLost = document.getElementById("report-date").value;
+            const imageFile = document.getElementById("report-image").files[0];
+
+            // Validation
+            if (!name || name.length < 2) {
+              Toast.error(
+                "Invalid name",
+                "Please enter your full name (at least 2 characters).",
+              );
               return;
             }
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-              preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
-              preview.classList.add('active');
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-
-        // Drag and drop
-        uploadArea.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          uploadArea.style.borderColor = 'var(--secondary)';
-          uploadArea.style.background = 'var(--info-bg)';
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-          uploadArea.style.borderColor = '';
-          uploadArea.style.background = '';
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-          e.preventDefault();
-          uploadArea.style.borderColor = '';
-          uploadArea.style.background = '';
-          const file = e.dataTransfer.files[0];
-          if (file && file.type.startsWith('image/')) {
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            fileInput.files = dt.files;
-            fileInput.dispatchEvent(new Event('change'));
-          }
-        });
-      }
-
-      function bindFormSubmit() {
-        const form = document.getElementById('report-form');
-        const successModal = document.getElementById('report-success-modal');
-        const reportAnotherBtn = document.getElementById('report-another-btn');
-
-        if (!form) return;
-
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-
-          const submitBtn = document.getElementById('report-submit-btn');
-          const name = document.getElementById('report-name').value.trim();
-          const email = document.getElementById('report-email').value.trim();
-          const phone = document.getElementById('report-phone').value.trim();
-          const itemTitle = document.getElementById('report-item-title').value.trim();
-          const description = document.getElementById('report-description').value.trim();
-          const category = document.getElementById('report-category').value;
-          const location = document.getElementById('report-location').value;
-          const dateLost = document.getElementById('report-date').value;
-          const imageFile = document.getElementById('report-image').files[0];
-
-          // Validation
-          if (!name || name.length < 2) {
-            Toast.error('Invalid name', 'Please enter your full name (at least 2 characters).');
-            return;
-          }
-          if (!Utils.isValidEmail(email)) {
-            Toast.error('Invalid email', 'Please enter a valid email address.');
-            return;
-          }
-          if (!Utils.isValidPhone(phone)) {
-            Toast.error('Invalid phone', 'Please enter a valid 10-digit mobile number.');
-            return;
-          }
-          if (!itemTitle || itemTitle.length < 2) {
-            Toast.error('Invalid item name', 'Please enter the item name.');
-            return;
-          }
-          if (!category) {
-            Toast.error('Category required', 'Please select a category.');
-            return;
-          }
-          if (!location) {
-            Toast.error('Location required', 'Please select the last seen location.');
-            return;
-          }
-          if (!dateLost) {
-            Toast.error('Date required', 'Please enter the date you lost the item.');
-            return;
-          }
-          if (!description || description.length < 20) {
-            Toast.error('More detail needed', 'Please provide at least 20 characters describing the item.');
-            return;
-          }
-
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span class="btn__spinner"></span> Submitting...';
-
-          try {
-            let imageUrl = null;
-            if (imageFile) {
-              imageUrl = await StorageHelper.uploadImage(imageFile, 'lost_reports');
+            if (!Utils.isValidEmail(email)) {
+              Toast.error(
+                "Invalid email",
+                "Please enter a valid email address.",
+              );
+              return;
+            }
+            if (!Utils.isValidPhone(phone)) {
+              Toast.error(
+                "Invalid phone",
+                "Please enter a valid 10-digit mobile number.",
+              );
+              return;
+            }
+            if (!itemTitle || itemTitle.length < 2) {
+              Toast.error("Invalid item name", "Please enter the item name.");
+              return;
+            }
+            if (!category) {
+              Toast.error("Category required", "Please select a category.");
+              return;
+            }
+            if (!location) {
+              Toast.error(
+                "Location required",
+                "Please select the last seen location.",
+              );
+              return;
+            }
+            if (!dateLost) {
+              Toast.error(
+                "Date required",
+                "Please enter the date you lost the item.",
+              );
+              return;
+            }
+            if (!description || description.length < 20) {
+              Toast.error(
+                "More detail needed",
+                "Please provide at least 20 characters describing the item.",
+              );
+              return;
             }
 
-            await LostReportsDB.submit({
-              student_name: name,
-              student_email: email,
-              student_phone: phone,
-              item_title: itemTitle,
-              description: description,
-              category: category,
-              last_seen_location: location,
-              date_lost: dateLost,
-              image_url: imageUrl
-            });
+            submitBtn.disabled = true;
+            submitBtn.innerHTML =
+              '<span class="btn__spinner"></span> Submitting...';
 
-            // Show success modal
-            if (successModal) successModal.classList.add('active');
-            form.reset();
-            setDefaultDate();
-            const preview = document.getElementById('report-image-preview');
-            if (preview) {
-              preview.innerHTML = '';
-              preview.classList.remove('active');
-            }
+            try {
+              let imageUrl = null;
+              if (imageFile) {
+                imageUrl = await StorageHelper.uploadImage(
+                  imageFile,
+                  "lost_reports",
+                );
+              }
 
-          } catch (err) {
-            console.error('Report submission error:', err);
-            Toast.error('Submission failed', err.message || 'Something went wrong. Please try again.');
-          } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `
+              await LostReportsDB.submit({
+                student_name: name,
+                student_email: email,
+                student_phone: phone,
+                item_title: itemTitle,
+                description: description,
+                category: category,
+                last_seen_location: location,
+                date_lost: firebase.firestore.Timestamp.fromDate(
+                  new Date(dateLost),
+                ),
+                image_url: imageUrl,
+              });
+
+              // Show success modal
+              if (successModal) successModal.classList.add("active");
+              form.reset();
+              setDefaultDate();
+              const preview = document.getElementById("report-image-preview");
+              if (preview) {
+                preview.innerHTML = "";
+                preview.classList.remove("active");
+              }
+            } catch (err) {
+              console.error("Report submission error:", err);
+              Toast.error(
+                "Submission failed",
+                err.message || "Something went wrong. Please try again.",
+              );
+            } finally {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
               Submit Report`;
-          }
-        });
+            }
+          });
 
-        // Report another
-        if (reportAnotherBtn) {
-          reportAnotherBtn.addEventListener('click', () => {
-            successModal.classList.remove('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+          // Report another
+          if (reportAnotherBtn) {
+            reportAnotherBtn.addEventListener("click", () => {
+              successModal.classList.remove("active");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+          }
+
+          // Close modal on overlay click or escape
+          if (successModal) {
+            successModal.addEventListener("click", (e) => {
+              if (e.target === successModal)
+                successModal.classList.remove("active");
+            });
+          }
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && successModal)
+              successModal.classList.remove("active");
           });
         }
 
-        // Close modal on overlay click or escape
-        if (successModal) {
-          successModal.addEventListener('click', (e) => {
-            if (e.target === successModal) successModal.classList.remove('active');
+        function setupMobileMenu() {
+          const btn = document.getElementById("menu-toggle");
+          const nav = document.getElementById("header-nav");
+          if (!btn || !nav) return;
+          btn.addEventListener("click", () =>
+            nav.classList.toggle("header__nav--open"),
+          );
+          document.addEventListener("click", (e) => {
+            if (!btn.contains(e.target) && !nav.contains(e.target)) {
+              nav.classList.remove("header__nav--open");
+            }
           });
         }
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && successModal) successModal.classList.remove('active');
-        });
-      }
-
-      function setupMobileMenu() {
-        const btn = document.getElementById('menu-toggle');
-        const nav = document.getElementById('header-nav');
-        if (!btn || !nav) return;
-        btn.addEventListener('click', () => nav.classList.toggle('header__nav--open'));
-        document.addEventListener('click', (e) => {
-          if (!btn.contains(e.target) && !nav.contains(e.target)) {
-            nav.classList.remove('header__nav--open');
-          }
-        });
-      }
-    })();
-  </script>
-
-</body>
+      })();
+    </script>
+  </body>
 </html>

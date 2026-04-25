@@ -6,7 +6,6 @@
       "**/.*",
       "**/node_modules/**",
       "firestore.rules",
-      "storage.rules",
       "README.md",
       "seed-data.js",
       "*.rules"
@@ -21,7 +20,7 @@
       {
         "source": "**/*.js",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=31536000" }
+          { "key": "Cache-Control", "value": "no-cache" }
         ]
       },
       {
@@ -35,8 +34,5 @@
   },
   "firestore": {
     "rules": "firestore.rules"
-  },
-  "storage": {
-    "rules": "storage.rules"
   }
 }

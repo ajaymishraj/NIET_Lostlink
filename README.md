@@ -16,12 +16,12 @@ A clean, production-ready Lost & Found web portal for NIET College. Built with p
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | HTML5, CSS3, Vanilla JavaScript (ES6+) |
-| Backend | Firebase (Firestore, Storage, Auth) |
-| Hosting | Firebase Hosting |
-| Animations | CSS + Intersection Observer |
+| Layer      | Technology                             |
+| ---------- | -------------------------------------- |
+| Frontend   | HTML5, CSS3, Vanilla JavaScript (ES6+) |
+| Backend    | Firebase (Firestore, Storage, Auth)    |
+| Hosting    | Firebase Hosting                       |
+| Animations | CSS + Intersection Observer            |
 
 ---
 
@@ -60,6 +60,7 @@ A clean, production-ready Lost & Found web portal for NIET College. Built with p
 ### Step 2: Enable Services
 
 #### Firestore Database
+
 1. In Firebase Console → **Build** → **Firestore Database**
 2. Click **Create database**
 3. Select **Start in production mode**
@@ -67,6 +68,7 @@ A clean, production-ready Lost & Found web portal for NIET College. Built with p
 5. Click **Enable**
 
 #### Authentication
+
 1. Go to **Build** → **Authentication**
 2. Click **Get started**
 3. Go to **Sign-in method** tab
@@ -75,6 +77,7 @@ A clean, production-ready Lost & Found web portal for NIET College. Built with p
 6. Enter admin email and password (e.g., `admin@niet.co.in` / `YourSecurePassword123`)
 
 #### Cloud Storage
+
 1. Go to **Build** → **Storage**
 2. Click **Get started**
 3. Select **Start in production mode**
@@ -98,7 +101,7 @@ const firebaseConfig = {
   projectId: "your-project-id",
   storageBucket: "your-project.appspot.com",
   messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
+  appId: "1:123456789:web:abc123",
 };
 ```
 
@@ -133,12 +136,12 @@ firebase deploy
 
 Go to **Firestore** → **Indexes** tab and create these composite indexes:
 
-| Collection | Fields | Query Scope |
-|-----------|--------|-------------|
-| `items` | `category` ASC, `date_found` DESC | Collection |
-| `items` | `status` ASC, `date_found` DESC | Collection |
-| `claims` | `item_id` ASC, `created_at` DESC | Collection |
-| `claims` | `student_email` ASC, `created_at` DESC | Collection |
+| Collection | Fields                                 | Query Scope |
+| ---------- | -------------------------------------- | ----------- |
+| `items`    | `category` ASC, `date_found` DESC      | Collection  |
+| `items`    | `status` ASC, `date_found` DESC        | Collection  |
+| `claims`   | `item_id` ASC, `created_at` DESC       | Collection  |
+| `claims`   | `student_email` ASC, `created_at` DESC | Collection  |
 
 > **Note**: Firebase will auto-suggest indexes if you see index errors in the browser console. Just click the provided link to create them.
 
@@ -195,6 +198,7 @@ Your site will be live at: `https://your-project-id.web.app`
 ## Firestore Data Structure
 
 ### `items` collection
+
 ```
 {
   title: "Blue JBL Earbuds",
@@ -211,6 +215,7 @@ Your site will be live at: `https://your-project-id.web.app`
 ```
 
 ### `claims` collection
+
 ```
 {
   item_id: "abc123",

@@ -18,7 +18,6 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 const auth = firebase.auth();
-const storage = firebase.storage();
 
 // ============================================
 // Firestore Helpers
@@ -55,8 +54,9 @@ const ItemsDB = {
    * Add a new item (admin only)
    */
   async add(data) {
+    const cleanData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null));
     const docRef = await db.collection('items').add({
-      ...data,
+      ...cleanData,
       status: data.status || 'available',
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -117,21 +117,22 @@ const ClaimsDB = {
    * Submit a new claim (public)
    */
   async submit(data) {
-    // Basic spam prevention: rate limit by email
-    const recent = await db.collection('claims')
-      .where('student_email', '==', data.student_email)
-      .where('created_at', '>', new Date(Date.now() - 5 * 60 * 1000))
-      .get();
-
-    if (recent.size >= 3) {
+    // Client-side rate limiting using localStorage
+    const lastSubmitKey = `last_submit_claim_${data.student_email}`;
+    const lastSubmitTime = localStorage.getItem(lastSubmitKey);
+    
+    if (lastSubmitTime && Date.now() - parseInt(lastSubmitTime) < 5 * 60 * 1000) {
       throw new Error('Too many requests. Please wait a few minutes before submitting another claim.');
     }
 
+    const cleanData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null));
     const docRef = await db.collection('claims').add({
-      ...data,
+      ...cleanData,
       status: 'pending',
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
+    localStorage.setItem(lastSubmitKey, Date.now().toString());
     return docRef.id;
   },
 
@@ -186,21 +187,22 @@ const LostReportsDB = {
    * Submit a lost item report (public)
    */
   async submit(data) {
-    // Basic spam prevention: rate limit by email
-    const recent = await db.collection('lost_reports')
-      .where('student_email', '==', data.student_email)
-      .where('created_at', '>', new Date(Date.now() - 5 * 60 * 1000))
-      .get();
-
-    if (recent.size >= 3) {
+    // Client-side rate limiting using localStorage
+    const lastSubmitKey = `last_submit_report_${data.student_email}`;
+    const lastSubmitTime = localStorage.getItem(lastSubmitKey);
+    
+    if (lastSubmitTime && Date.now() - parseInt(lastSubmitTime) < 5 * 60 * 1000) {
       throw new Error('Too many requests. Please wait a few minutes before submitting another report.');
     }
 
+    const cleanData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null));
     const docRef = await db.collection('lost_reports').add({
-      ...data,
+      ...cleanData,
       status: 'open',
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
+    
+    localStorage.setItem(lastSubmitKey, Date.now().toString());
     return docRef.id;
   },
 
@@ -245,28 +247,19 @@ const LostReportsDB = {
 
 const StorageHelper = {
   /**
-   * Upload an image file and return its download URL
+   * Compress an image and return its Base64 data URL
    */
   async uploadImage(file, folder = 'items') {
-    const ext = file.name.split('.').pop();
-    const filename = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
-    const ref = storage.ref(filename);
-
-    // Compress if image is too large (> 2MB)
-    let uploadFile = file;
-    if (file.size > 2 * 1024 * 1024 && file.type.startsWith('image/')) {
-      uploadFile = await this.compressImage(file, 0.7, 1200);
-    }
-
-    const snapshot = await ref.put(uploadFile);
-    return await snapshot.ref.getDownloadURL();
+    // We bypass actual upload and just return a compressed base64 string
+    // Resize to max 800px width and 60% quality to keep size small for Firestore
+    return await this.compressImage(file, 0.6, 800);
   },
 
   /**
-   * Basic image compression using canvas
+   * Image compression using canvas
    */
-  compressImage(file, quality = 0.7, maxWidth = 1200) {
-    return new Promise((resolve) => {
+  compressImage(file, quality = 0.6, maxWidth = 800) {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -283,12 +276,21 @@ const StorageHelper = {
           canvas.height = height;
 
           const ctx = canvas.getContext('2d');
+          
+          // Fill with white background to prevent transparent PNGs turning black
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          
           ctx.drawImage(img, 0, 0, width, height);
 
-          canvas.toBlob(resolve, 'image/jpeg', quality);
+          // Return base64 string instead of blob
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
         };
+        img.onerror = reject;
         img.src = e.target.result;
       };
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
   }

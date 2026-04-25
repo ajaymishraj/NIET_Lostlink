@@ -1,0 +1,24 @@
+{
+  "name": "code-sprint",
+  "version": "1.0.0",
+  "description": "A clean, production-ready Lost & Found web portal for NIET College. Built with pure HTML, CSS, and JavaScript, powered by Firebase.",
+  "main": "seed-data.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajaymishraj/niet-lost-link.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ajaymishraj/niet-lost-link/issues"
+  },
+  "homepage": "https://github.com/ajaymishraj/niet-lost-link#readme",
+  "dependencies": {
+    "firebase": "^12.12.1"
+  }
+}
