@@ -1,0 +1,19 @@
+# Firebase files
+.firebase/
+firebaserc
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Local Server
+/tmp/

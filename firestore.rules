@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // ITEMS COLLECTION
+    // ========================================
+    match /items/{itemId} {
+      // Anyone can read items (public browse)
+      allow read: if true;
+
+      // Only authenticated admin can create/update/delete
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // ========================================
+    // CLAIMS COLLECTION
+    // ========================================
+    match /claims/{claimId} {
+      // Only authenticated admin can read all claims
+      allow read: if request.auth != null;
+
+      // Anyone can create a claim (public form submission)
+      // But with validation to prevent spam/abuse
+      allow create: if
+        // Required fields must exist
+        request.resource.data.keys().hasAll([
+          'item_id', 'student_name', 'student_email',
+          'student_phone', 'proof_description', 'status', 'created_at'
+        ])
+        // Status must be 'pending' on creation
+        && request.resource.data.status == 'pending'
+        // Name validation (2-100 chars)
+        && request.resource.data.student_name is string
+        && request.resource.data.student_name.size() >= 2
+        && request.resource.data.student_name.size() <= 100
+        // Email validation (basic)
+        && request.resource.data.student_email is string
+        && request.resource.data.student_email.matches('.*@.*\\..*')
+        // Phone validation
+        && request.resource.data.student_phone is string
+        && request.resource.data.student_phone.size() >= 10
+        // Proof description (min 20 chars)
+        && request.resource.data.proof_description is string
+        && request.resource.data.proof_description.size() >= 20;
+
+      // Only admin can update claims (approve/reject)
+      allow update: if request.auth != null;
+
+      // Only admin can delete claims
+      allow delete: if request.auth != null;
+    }
+
+    // ========================================
+    // LOST REPORTS COLLECTION
+    // ========================================
+    match /lost_reports/{reportId} {
+      // Only authenticated admin can read all reports
+      allow read: if request.auth != null;
+
+      // Anyone can create a report (public form submission)
+      allow create: if
+        request.resource.data.keys().hasAll([
+          'student_name', 'student_email', 'student_phone',
+          'item_title', 'description', 'category',
+          'last_seen_location', 'date_lost', 'status', 'created_at'
+        ])
+        && request.resource.data.status == 'open'
+        && request.resource.data.student_name is string
+        && request.resource.data.student_name.size() >= 2
+        && request.resource.data.student_name.size() <= 100
+        && request.resource.data.student_email is string
+        && request.resource.data.student_email.matches('.*@.*\\..*')
+        && request.resource.data.student_phone is string
+        && request.resource.data.student_phone.size() >= 10
+        && request.resource.data.item_title is string
+        && request.resource.data.item_title.size() >= 2
+        && request.resource.data.description is string
+        && request.resource.data.description.size() >= 20;
+
+      // Only admin can update reports (matched/closed)
+      allow update: if request.auth != null;
+
+      // Only admin can delete reports
+      allow delete: if request.auth != null;
+    }
+
+    // ========================================
+    // DENY ALL OTHER COLLECTIONS
+    // ========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIET Lost & Found — Find Your Lost Items</title>
+  <meta name="description" content="NIET College Lost & Found Portal. Browse found items, search by category, and submit a claim request to recover your belongings.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ========= HEADER ========= -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a href="index.html" class="header__brand">
+        <div class="header__logo">LF</div>
+        <div>
+          <div class="header__title">Lost & Found</div>
+          <div class="header__subtitle">NIET College</div>
+        </div>
+      </a>
+      <button class="header__menu-btn" id="menu-toggle" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <nav class="header__nav" id="header-nav">
+        <a href="index.html" class="header__link header__link--active">Browse Items</a>
+        <a href="report.html" class="header__link">Report Lost</a>
+        <a href="admin.html" class="header__link header__link--admin">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========= HERO ========= -->
+  <section class="hero" role="search">
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Live — Items are updated in real time
+      </div>
+      <h1>Lost Something on Campus?<br><span class="hero__highlight">We've Got You.</span></h1>
+      <p>Browse found items reported by NIET staff. If you spot something that belongs to you, submit a claim request — no login needed.</p>
+      <div class="hero__search">
+        <span class="hero__search-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input
+          type="text"
+          id="hero-search"
+          class="hero__search-input"
+          placeholder="Search for your item... (e.g. blue water bottle, ID card)"
+          aria-label="Search items"
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- ========= MAIN CONTENT ========= -->
+  <main class="main" id="items-section">
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-card__value" id="stat-total">—</div>
+        <div class="stat-card__label">Total Items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value" id="stat-available">—</div>
+        <div class="stat-card__label">Available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value" id="stat-claimed">—</div>
+        <div class="stat-card__label">Claimed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value" id="stat-returned">—</div>
+        <div class="stat-card__label">Returned</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <span class="filters__label">Filter by:</span>
+
+      <select class="filter-select" id="filter-category" aria-label="Filter by category">
+        <option value="all">All Categories</option>
+      </select>
+
+      <select class="filter-select" id="filter-status" aria-label="Filter by status">
+        <option value="all">All Status</option>
+        <option value="available">Available</option>
+        <option value="claimed">Claimed</option>
+        <option value="returned">Returned</option>
+      </select>
+
+      <select class="filter-select" id="filter-date" aria-label="Filter by date">
+        <option value="all">Any Time</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+      </select>
+
+      <input
+        type="text"
+        id="search-input"
+        class="form-input"
+        placeholder="Search items..."
+        aria-label="Search items"
+        style="max-width:220px;padding:8px 14px;font-size:0.85rem"
+      >
+
+      <button class="filters__clear" id="clear-filters">Clear All</button>
+    </div>
+
+    <!-- Items header -->
+    <div class="items-section__header">
+      <h2 class="items-section__title">Found Items</h2>
+      <span class="items-section__count" id="items-count"></span>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div class="loading-skeleton" id="items-loading">
+      <div class="skeleton-card">
+        <div class="skeleton-card__img"></div>
+        <div class="skeleton-card__body">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-line skeleton-line--full"></div>
+          <div class="skeleton-line skeleton-line--medium"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-card__img"></div>
+        <div class="skeleton-card__body">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-line skeleton-line--full"></div>
+          <div class="skeleton-line skeleton-line--medium"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-card__img"></div>
+        <div class="skeleton-card__body">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-line skeleton-line--full"></div>
+          <div class="skeleton-line skeleton-line--medium"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items grid -->
+    <div class="items-grid" id="items-grid"></div>
+
+    <!-- Empty state -->
+    <div class="empty-state hidden" id="items-empty">
+      <div class="empty-state__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <h3 class="empty-state__title">No items found</h3>
+      <p class="empty-state__desc">Try adjusting your filters or search terms. New items are added regularly by campus staff.</p>
+    </div>
+
+  </main>
+
+  <!-- ========= FOOTER ========= -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">NIET Lost & Found</div>
+      <p class="footer__text">Noida Institute of Engineering & Technology</p>
+      <p class="footer__text">Greater Noida, UP, India</p>
+      <div class="footer__divider"></div>
+      <p class="footer__copy">&copy; 2026 NIET College. Built for the campus community.</p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/firebase.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

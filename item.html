@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Item Details — NIET Lost & Found</title>
+  <meta name="description" content="View item details and submit a claim request on NIET College Lost & Found Portal.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ========= HEADER ========= -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a href="index.html" class="header__brand">
+        <div class="header__logo">LF</div>
+        <div>
+          <div class="header__title">Lost & Found</div>
+          <div class="header__subtitle">NIET College</div>
+        </div>
+      </a>
+      <button class="header__menu-btn" id="menu-toggle" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <nav class="header__nav" id="header-nav">
+        <a href="index.html" class="header__link">Browse Items</a>
+        <a href="report.html" class="header__link">Report Lost</a>
+        <a href="admin.html" class="header__link header__link--admin">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========= ITEM DETAIL ========= -->
+  <main class="item-detail" id="item-detail-page">
+
+    <a href="index.html" class="item-detail__back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to all items
+    </a>
+
+    <!-- Loading state -->
+    <div id="item-loading" style="text-align:center;padding:60px 0">
+      <div class="btn__spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 16px;border-color:var(--border);border-top-color:var(--secondary)"></div>
+      <p class="text-muted">Loading item details...</p>
+    </div>
+
+    <!-- Item content (populated by JS) -->
+    <div id="item-content" class="hidden">
+      <div class="item-detail__grid">
+        <!-- Image -->
+        <div id="item-image-container"></div>
+
+        <!-- Info -->
+        <div class="item-detail__info">
+          <div id="item-status-container"></div>
+          <h1 class="item-detail__title" id="item-title-display"></h1>
+          <p class="item-detail__desc" id="item-desc-display"></p>
+
+          <div class="item-detail__meta-grid">
+            <div class="item-detail__meta-item">
+              <span class="item-detail__meta-label">Category</span>
+              <span class="item-detail__meta-value" id="item-category-display"></span>
+            </div>
+            <div class="item-detail__meta-item">
+              <span class="item-detail__meta-label">Location Found</span>
+              <span class="item-detail__meta-value" id="item-location-display"></span>
+            </div>
+            <div class="item-detail__meta-item">
+              <span class="item-detail__meta-label">Date Found</span>
+              <span class="item-detail__meta-value" id="item-date-display"></span>
+            </div>
+            <div class="item-detail__meta-item">
+              <span class="item-detail__meta-label">Status</span>
+              <span class="item-detail__meta-value" id="item-status-text"></span>
+            </div>
+          </div>
+
+          <!-- Claim button -->
+          <div id="claim-btn-container" class="mt-8">
+            <button class="btn btn--primary btn--lg btn--full" id="claim-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+              Claim This Item
+            </button>
+            <p class="form-group__hint mt-4" style="text-align:center">No login required. Fill out a short form to submit your claim request.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Not found state -->
+    <div id="item-not-found" class="empty-state hidden">
+      <div class="empty-state__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h3 class="empty-state__title">Item not found</h3>
+      <p class="empty-state__desc">This item may have been removed or the link is invalid.</p>
+      <a href="index.html" class="btn btn--primary mt-8">Browse All Items</a>
+    </div>
+  </main>
+
+  <!-- ========= CLAIM MODAL ========= -->
+  <div class="modal-overlay" id="claim-modal" role="dialog" aria-modal="true" aria-labelledby="claim-modal-title">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title" id="claim-modal-title">Submit Claim Request</h2>
+        <button class="modal__close" data-close-claim aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="claim-form">
+        <div class="modal__body">
+          <p class="text-muted mb-4" style="font-size:0.85rem">Tell us about your ownership. The admin will review your claim and reach out via email or phone.</p>
+
+          <div class="form-group">
+            <label class="form-group__label" for="claim-name">Full Name <span>*</span></label>
+            <input type="text" id="claim-name" class="form-input" placeholder="Your full name" required minlength="2" maxlength="100">
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label" for="claim-email">Email Address <span>*</span></label>
+            <input type="email" id="claim-email" class="form-input" placeholder="your.email@niet.co.in" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label" for="claim-phone">Phone Number <span>*</span></label>
+            <input type="tel" id="claim-phone" class="form-input" placeholder="10-digit mobile number" required pattern="[6-9][0-9]{9}" maxlength="10">
+            <p class="form-group__hint">Indian mobile number (e.g., 9876543210)</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label" for="claim-proof">Proof of Ownership <span>*</span></label>
+            <textarea id="claim-proof" class="form-textarea" placeholder="Describe how you can prove this item is yours. Include distinguishing features, contents, or any identifying marks." required minlength="20" maxlength="1000"></textarea>
+            <p class="form-group__hint">Minimum 20 characters. Be as specific as possible.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label">Proof Image (optional)</label>
+            <div class="file-upload" id="claim-file-upload">
+              <div class="file-upload__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <p class="file-upload__text"><strong>Click to upload</strong> or drag and drop</p>
+              <p class="file-upload__hint">PNG, JPG up to 5MB</p>
+              <input type="file" id="claim-image" accept="image/png,image/jpeg,image/webp">
+              <div class="file-upload__preview" id="claim-image-preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn btn--outline" data-close-claim>Cancel</button>
+          <button type="submit" class="btn btn--primary" id="claim-submit-btn">Submit Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========= SUCCESS MODAL ========= -->
+  <div class="modal-overlay" id="claim-success-modal">
+    <div class="modal" style="text-align:center;max-width:420px">
+      <div class="modal__body" style="padding:40px 32px">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" width="32" height="32"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 style="margin-bottom:12px">Claim Submitted!</h2>
+        <p class="text-muted" style="font-size:0.9rem;margin-bottom:24px">Your claim request has been submitted successfully. The admin will review it and contact you shortly via email or phone.</p>
+        <a href="index.html" class="btn btn--primary">Browse More Items</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========= FOOTER ========= -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">NIET Lost & Found</div>
+      <p class="footer__text">Noida Institute of Engineering & Technology</p>
+      <div class="footer__divider"></div>
+      <p class="footer__copy">&copy; 2026 NIET College. Built for the campus community.</p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/firebase.js"></script>
+
+  <!-- Page-specific logic -->
+  <script>
+    (function () {
+      'use strict';
+
+      document.addEventListener('DOMContentLoaded', init);
+
+      async function init() {
+        setupMobileMenu();
+        const itemId = Utils.getParam('id');
+
+        if (!itemId) {
+          showNotFound();
+          return;
+        }
+
+        try {
+          const item = await ItemsDB.getById(itemId);
+          if (!item) {
+            showNotFound();
+            return;
+          }
+          renderItem(item);
+          bindClaimEvents(item);
+        } catch (err) {
+          console.error('Failed to load item:', err);
+          showNotFound();
+        }
+      }
+
+      function renderItem(item) {
+        document.getElementById('item-loading').classList.add('hidden');
+        document.getElementById('item-content').classList.remove('hidden');
+
+        // Update page title
+        document.title = `${item.title} — NIET Lost & Found`;
+
+        // Image
+        const imgContainer = document.getElementById('item-image-container');
+        if (item.image_url) {
+          imgContainer.innerHTML = `<div class="item-detail__image-wrap"><img class="item-detail__image" src="${item.image_url}" alt="${Utils.escapeHtml(item.title)}"></div>`;
+        } else {
+          imgContainer.innerHTML = `
+            <div class="item-detail__image-wrap">
+              <div class="item-detail__image-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+            </div>`;
+        }
+
+        // Status badge
+        const statusContainer = document.getElementById('item-status-container');
+        statusContainer.innerHTML = `
+          <span class="item-detail__status-badge item-detail__status-badge--${item.status || 'available'}">
+            <span class="status-badge__dot"></span>
+            ${item.status || 'available'}
+          </span>`;
+
+        // Text fields
+        document.getElementById('item-title-display').textContent = item.title;
+        document.getElementById('item-desc-display').textContent = item.description || 'No description provided.';
+        document.getElementById('item-category-display').textContent = item.category || 'Uncategorized';
+        document.getElementById('item-location-display').textContent = item.location_found || 'Not specified';
+        document.getElementById('item-date-display').textContent = Utils.formatDate(item.date_found);
+        document.getElementById('item-status-text').textContent = (item.status || 'available').charAt(0).toUpperCase() + (item.status || 'available').slice(1);
+
+        // Hide claim button if item is not available
+        if (item.status !== 'available') {
+          const claimContainer = document.getElementById('claim-btn-container');
+          claimContainer.innerHTML = `
+            <div style="padding:16px;border-radius:var(--radius);background:var(--warning-bg);text-align:center">
+              <p style="font-weight:600;color:#92400e;margin-bottom:4px">This item has been ${item.status}</p>
+              <p class="text-muted" style="font-size:0.85rem">Claims are no longer accepted for this item.</p>
+            </div>`;
+        }
+      }
+
+      function bindClaimEvents(item) {
+        const claimBtn = document.getElementById('claim-btn');
+        const claimModal = document.getElementById('claim-modal');
+        const claimForm = document.getElementById('claim-form');
+        const successModal = document.getElementById('claim-success-modal');
+
+        if (!claimBtn || !claimModal) return;
+
+        // Open claim modal
+        claimBtn.addEventListener('click', () => {
+          claimModal.classList.add('active');
+        });
+
+        // Close claim modal
+        document.querySelectorAll('[data-close-claim]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            claimModal.classList.remove('active');
+          });
+        });
+
+        // Close on overlay click
+        claimModal.addEventListener('click', (e) => {
+          if (e.target === claimModal) claimModal.classList.remove('active');
+        });
+
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            claimModal.classList.remove('active');
+            successModal.classList.remove('active');
+          }
+        });
+
+        // File upload preview
+        const fileUpload = document.getElementById('claim-file-upload');
+        const fileInput = document.getElementById('claim-image');
+        const filePreview = document.getElementById('claim-image-preview');
+
+        if (fileUpload && fileInput) {
+          fileUpload.addEventListener('click', () => fileInput.click());
+
+          fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file && filePreview) {
+              if (file.size > 5 * 1024 * 1024) {
+                Toast.error('File too large', 'Please upload an image under 5MB.');
+                fileInput.value = '';
+                return;
+              }
+              const reader = new FileReader();
+              reader.onload = (ev) => {
+                filePreview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+                filePreview.classList.add('active');
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+
+          // Drag and drop
+          fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = 'var(--secondary)';
+            fileUpload.style.background = 'var(--info-bg)';
+          });
+
+          fileUpload.addEventListener('dragleave', () => {
+            fileUpload.style.borderColor = '';
+            fileUpload.style.background = '';
+          });
+
+          fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.style.borderColor = '';
+            fileUpload.style.background = '';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+              // Create a new DataTransfer to set files on the input
+              const dt = new DataTransfer();
+              dt.items.add(file);
+              fileInput.files = dt.files;
+              fileInput.dispatchEvent(new Event('change'));
+            }
+          });
+        }
+
+        // Submit claim
+        if (claimForm) {
+          claimForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('claim-submit-btn');
+            const name = document.getElementById('claim-name').value.trim();
+            const email = document.getElementById('claim-email').value.trim();
+            const phone = document.getElementById('claim-phone').value.trim();
+            const proof = document.getElementById('claim-proof').value.trim();
+            const imageFile = document.getElementById('claim-image').files[0];
+
+            // Validation
+            if (!name || name.length < 2) {
+              Toast.error('Invalid name', 'Please enter your full name.');
+              return;
+            }
+
+            if (!Utils.isValidEmail(email)) {
+              Toast.error('Invalid email', 'Please enter a valid email address.');
+              return;
+            }
+
+            if (!Utils.isValidPhone(phone)) {
+              Toast.error('Invalid phone', 'Please enter a valid 10-digit mobile number.');
+              return;
+            }
+
+            if (!proof || proof.length < 20) {
+              Toast.error('Insufficient proof', 'Please provide at least 20 characters describing your proof of ownership.');
+              return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="btn__spinner"></span> Submitting...';
+
+            try {
+              let proofImageUrl = null;
+              if (imageFile) {
+                proofImageUrl = await StorageHelper.uploadImage(imageFile, 'claims');
+              }
+
+              await ClaimsDB.submit({
+                item_id: item.id,
+                student_name: name,
+                student_email: email,
+                student_phone: phone,
+                proof_description: proof,
+                proof_image: proofImageUrl
+              });
+
+              // Close claim form, show success
+              claimModal.classList.remove('active');
+              successModal.classList.add('active');
+
+            } catch (err) {
+              console.error('Claim submission error:', err);
+              Toast.error('Submission failed', err.message || 'Something went wrong. Please try again.');
+            } finally {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Submit Claim';
+            }
+          });
+        }
+      }
+
+      function showNotFound() {
+        document.getElementById('item-loading').classList.add('hidden');
+        document.getElementById('item-not-found').classList.remove('hidden');
+      }
+
+      function setupMobileMenu() {
+        const btn = document.getElementById('menu-toggle');
+        const nav = document.getElementById('header-nav');
+        if (!btn || !nav) return;
+        btn.addEventListener('click', () => nav.classList.toggle('header__nav--open'));
+        document.addEventListener('click', (e) => {
+          if (!btn.contains(e.target) && !nav.contains(e.target)) {
+            nav.classList.remove('header__nav--open');
+          }
+        });
+      }
+
+    })();
+  </script>
+
+</body>
+</html>
