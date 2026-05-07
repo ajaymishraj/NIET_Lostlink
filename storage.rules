@@ -1,0 +1,16 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // ============================================
+    // NIET Lost & Found — Storage Rules
+    // ============================================
+    // NOTE: This project stores images as Base64 strings in Firestore,
+    // so Firebase Storage is NOT actively used. These rules deny all
+    // access as a security measure.
+
+    match /{allPaths=**} {
+      // Deny all reads and writes
+      allow read, write: if false;
+    }
+  }
+}
