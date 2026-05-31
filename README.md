@@ -1,3 +1,36 @@
+# LostLink — NIET Lost & Found
+
+A simple lost & found system for the NIET campus.
+
+## Problem
+
+No easy campus lost & found system at NIET.
+
+## Features
+
+### Public
+- Browse reported items
+- Report a lost or found item
+- Search and filter results by category, date, and location
+
+### Admin
+- Claim management: mark items as claimed and manage ownership
+- Dashboard: view open/claimed items and site statistics
+
+## Technical
+
+This project uses Firebase Firestore for data storage. Multi-field filtering in Firestore requires composite indexes; index definitions are included in `firestore.indexes.json`. Deploy indexes with:
+
+## Tech stack
+
+- **Frontend:** HTML, CSS, Vanilla JavaScript (app.js)
+- **Database:** Firebase Firestore
+- **Hosting / Tools:** Firebase Hosting, Node/npm for dev scripts
+
+## Screenshots
+
+![LostLink screenshot](lostlinkss.png)
+
 # NIET Lost & Found Portal
 
 A clean, production-ready Lost & Found web portal for NIET College. Built with pure HTML, CSS, and JavaScript, powered by Firebase.
@@ -47,105 +80,6 @@ A clean, production-ready Lost & Found web portal for NIET College. Built with p
 
 ---
 
-## Firebase Setup Guide
-
-### Step 1: Create Firebase Project
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click **"Add project"**
-3. Name it (e.g., `niet-lost-found`)
-4. Disable Google Analytics (not needed) or enable if you want
-5. Click **Create project**
-
-### Step 2: Enable Services
-
-#### Firestore Database
-
-1. In Firebase Console → **Build** → **Firestore Database**
-2. Click **Create database**
-3. Select **Start in production mode**
-4. Choose a region close to India (e.g., `asia-south1`)
-5. Click **Enable**
-
-#### Authentication
-
-1. Go to **Build** → **Authentication**
-2. Click **Get started**
-3. Go to **Sign-in method** tab
-4. Enable **Email/Password**
-5. Go to **Users** tab → **Add user**
-6. Enter admin email and password (e.g., `admin@niet.co.in` / `YourSecurePassword123`)
-
-#### Cloud Storage
-
-1. Go to **Build** → **Storage**
-2. Click **Get started**
-3. Select **Start in production mode**
-4. Choose the same region as Firestore
-
-### Step 3: Get Firebase Config
-
-1. Go to **Project Settings** (gear icon) → **General**
-2. Scroll down to **"Your apps"** → Click **Web** (`</>` icon)
-3. Register the app (name: "NIET Lost & Found")
-4. Copy the `firebaseConfig` object
-
-### Step 4: Update Your Code
-
-Open `js/firebase.js` and replace the placeholder config:
-
-```javascript
-const firebaseConfig = {
-  apiKey: "YOUR_ACTUAL_API_KEY",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123",
-};
-```
-
-### Step 5: Deploy Security Rules
-
-#### Option A: Firebase CLI (Recommended)
-
-```bash
-# Install Firebase CLI
-npm install -g firebase-tools
-
-# Login
-firebase login
-
-# Initialize (select Firestore, Storage, Hosting)
-# When prompted, use existing files — DON'T overwrite!
-firebase init
-
-# Deploy rules
-firebase deploy --only firestore:rules,storage:rules
-
-# Deploy everything
-firebase deploy
-```
-
-#### Option B: Firebase Console
-
-1. **Firestore Rules**: Go to Firestore → Rules tab → paste contents of `firestore.rules` → Publish
-2. **Storage Rules**: Go to Storage → Rules tab → paste contents of `storage.rules` → Publish
-
-### Step 6: Create Firestore Indexes
-
-Go to **Firestore** → **Indexes** tab and create these composite indexes:
-
-| Collection | Fields                                 | Query Scope |
-| ---------- | -------------------------------------- | ----------- |
-| `items`    | `category` ASC, `date_found` DESC      | Collection  |
-| `items`    | `status` ASC, `date_found` DESC        | Collection  |
-| `claims`   | `item_id` ASC, `created_at` DESC       | Collection  |
-| `claims`   | `student_email` ASC, `created_at` DESC | Collection  |
-
-> **Note**: Firebase will auto-suggest indexes if you see index errors in the browser console. Just click the provided link to create them.
-
----
 
 ## Seed Sample Data
 
@@ -155,43 +89,6 @@ Go to **Firestore** → **Indexes** tab and create these composite indexes:
 4. Copy and paste the contents of `seed-data.js`
 5. Press Enter
 6. Refresh the page
-
----
-
-## Local Development
-
-You can use any local server to run this:
-
-```bash
-# Option 1: Python
-python -m http.server 8080
-
-# Option 2: Node.js (npx)
-npx serve .
-
-# Option 3: VS Code Live Server extension
-# Right-click index.html → Open with Live Server
-
-# Option 4: Firebase Emulator
-firebase emulators:start
-```
-
----
-
-## Deployment
-
-```bash
-# Deploy everything to Firebase Hosting
-firebase deploy
-
-# Deploy only hosting
-firebase deploy --only hosting
-
-# Deploy only rules
-firebase deploy --only firestore:rules,storage:rules
-```
-
-Your site will be live at: `https://your-project-id.web.app`
 
 ---
 
