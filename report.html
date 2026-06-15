@@ -638,9 +638,12 @@
                 description: description,
                 category: category,
                 last_seen_location: location,
-                date_lost: firebase.firestore.Timestamp.fromDate(
-                  new Date(dateLost),
-                ),
+                date_lost: (() => {
+                  const parsed = dateLost ? new Date(dateLost) : new Date();
+                  return firebase.firestore.Timestamp.fromDate(
+                    isNaN(parsed.getTime()) ? new Date() : parsed
+                  );
+                })(),
                 image_url: imageUrl,
               });
 
@@ -655,10 +658,16 @@
               }
             } catch (err) {
               console.error("Report submission error:", err);
-              Toast.error(
-                "Submission failed",
-                err.message || "Something went wrong. Please try again.",
-              );
+              let errorTitle = "Submission failed";
+              let errorMsg = err.message || "Something went wrong. Please try again.";
+              
+              if (err.code === "rate-limit") {
+                errorTitle = "Too many requests";
+              } else if (err.code === "network") {
+                errorTitle = "Network error";
+              }
+              
+              Toast.error(errorTitle, errorMsg);
             } finally {
               submitBtn.disabled = false;
               submitBtn.innerHTML = `
@@ -694,12 +703,34 @@
           const btn = document.getElementById("menu-toggle");
           const nav = document.getElementById("header-nav");
           if (!btn || !nav) return;
-          btn.addEventListener("click", () =>
-            nav.classList.toggle("header__nav--open"),
-          );
-          document.addEventListener("click", (e) => {
-            if (!btn.contains(e.target) && !nav.contains(e.target)) {
-              nav.classList.remove("header__nav--open");
+
+          // Create overlay if it doesn't exist
+          let overlay = document.querySelector(".nav-overlay");
+          if (!overlay) {
+            overlay = document.createElement("div");
+            overlay.className = "nav-overlay";
+            document.body.appendChild(overlay);
+          }
+
+          function toggleMenu(force) {
+            const isOpen = typeof force === "boolean" ? force : !nav.classList.contains("active");
+            nav.classList.toggle("active", isOpen);
+            overlay.classList.toggle("active", isOpen);
+            document.body.style.overflow = isOpen ? "hidden" : "";
+          }
+
+          btn.addEventListener("click", () => toggleMenu());
+          overlay.addEventListener("click", () => toggleMenu(false));
+
+          // Close on link click
+          nav.querySelectorAll(".header__link").forEach((link) => {
+            link.addEventListener("click", () => toggleMenu(false));
+          });
+
+          // Handle escape key
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && nav.classList.contains("active")) {
+              toggleMenu(false);
             }
           });
         }

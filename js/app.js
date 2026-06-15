@@ -164,7 +164,7 @@
 
   async function loadStats() {
     try {
-      const counts = await ItemsDB.getCounts();
+      const counts = await ItemsDB.getCounts(allItems);
       if (statsTotal) statsTotal.textContent = counts.total;
       if (statsAvailable) statsAvailable.textContent = counts.available;
       if (statsClaimed) statsClaimed.textContent = counts.claimed;

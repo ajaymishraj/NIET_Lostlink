@@ -128,44 +128,6 @@
     if (isDashboardInitialized) return;
     isDashboardInitialized = true;
 
-    // Expose core AdminActions for onclick handlers — merge so we don't overwrite full handlers.
-    window.AdminActions = Object.assign(window.AdminActions || {}, {
-      editItem: (id) => openItemModal(id),
-      deleteItem: async (id) => {
-        if (confirm("Are you sure you want to delete this item?")) {
-          try {
-            await ItemsDB.delete(id);
-            Toast.success("Deleted", "Item removed successfully.");
-            await loadAdminItems();
-            await loadDashboard();
-          } catch (err) {
-            Toast.error("Error", "Failed to delete item.");
-          }
-        }
-      },
-      markReturned: async (id) => {
-        try {
-          await ItemsDB.update(id, { status: "returned" });
-          Toast.success("Updated", "Item marked as returned.");
-          await loadAdminItems();
-          await loadDashboard();
-        } catch (err) {
-          Toast.error("Error", "Failed to update item.");
-        }
-      },
-      approveClaim: async (id) => {
-        try {
-          await ClaimsDB.update(id, { status: "approved" });
-          Toast.success("Approved", "Claim request approved.");
-          await loadAdminClaims();
-          await loadDashboard();
-        } catch (err) {
-          Toast.error("Error", "Failed to approve claim.");
-        }
-      },
-      // Note: intentionally not overriding `viewClaim`/`viewReport` here so detailed view handlers (defined elsewhere) remain intact.
-    });
-
     bindSidebarEvents();
     bindAdminEvents();
     initMobileSidebar();
@@ -307,6 +269,14 @@
         const file = e.target.files[0];
         const preview = document.getElementById("item-image-preview");
         if (file && preview) {
+          if (file.size > 5 * 1024 * 1024) {
+            Toast.error(
+              "File too large",
+              "Please upload an image under 5MB.",
+            );
+            itemImageInput.value = "";
+            return;
+          }
           const reader = new FileReader();
           reader.onload = (ev) => {
             preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
@@ -356,10 +326,19 @@
 
   async function loadDashboard() {
     try {
-      // Load metrics
+      // Load all items and claims first (since we need them for recent listings anyway)
+      const [allAdminItems, allAdminClaims] = await Promise.all([
+        ItemsDB.getAll(),
+        ClaimsDB.getAll(),
+      ]);
+
+      adminItems = allAdminItems;
+      adminClaims = allAdminClaims;
+
+      // Compute metrics client-side from the loaded data to avoid double fetch
       const [itemCounts, claimCounts] = await Promise.all([
-        ItemsDB.getCounts(),
-        ClaimsDB.getCounts(),
+        ItemsDB.getCounts(adminItems),
+        ClaimsDB.getCounts(allAdminClaims),
       ]);
 
       const dashTotal = document.getElementById("dash-total");
@@ -383,17 +362,39 @@
       if (dashReturnedSub)
         dashReturnedSub.textContent = `${itemCounts.claimed} claimed`;
 
-      // Load recent items for dashboard
-      adminItems = await ItemsDB.getAll();
       renderDashboardItems(adminItems.slice(0, 4));
-
-      // Load recent claims for dashboard
-      adminClaims = await ClaimsDB.getAll();
       await renderDashboardClaims(
         adminClaims.filter((c) => c.status === "pending").slice(0, 3),
       );
     } catch (err) {
       console.error("Dashboard load error:", err);
+      const errMessage = err.code === "permission-denied"
+        ? "Access Denied: You do not have administrator permissions."
+        : "Failed to load dashboard data. Please try again.";
+      Toast.error("Load Error", errMessage);
+
+      const elementsToFail = [
+        "dash-available-sub",
+        "dash-claims-sub",
+        "dash-returned-sub"
+      ];
+      elementsToFail.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = "Error loading";
+      });
+
+      const containersToFail = [
+        "dash-claims-list",
+        "dash-items-list"
+      ];
+      containersToFail.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `<div class="adm-empty-inline" style="color:var(--danger)">${errMessage}</div>`;
+      });
+
+      if (err.code === "permission-denied") {
+        AuthHelper.logout();
+      }
     }
   }
 
@@ -578,7 +579,14 @@
         .join("");
     } catch (err) {
       console.error("Failed to load items:", err);
-      Toast.error("Error", "Failed to load items.");
+      const errMessage = err.code === "permission-denied"
+        ? "Access Denied: You do not have permission to view items."
+        : "Failed to load items.";
+      Toast.error("Error", errMessage);
+      tableBody.innerHTML = `<tr><td colspan="6" class="adm-table-empty" style="color:var(--danger)">${errMessage}</td></tr>`;
+      if (err.code === "permission-denied") {
+        AuthHelper.logout();
+      }
     }
   }
 
@@ -666,9 +674,13 @@
         description: document.getElementById("item-description").value.trim(),
         category: document.getElementById("item-category").value,
         location_found: document.getElementById("item-location").value,
-        date_found: firebase.firestore.Timestamp.fromDate(
-          new Date(document.getElementById("item-date").value),
-        ),
+        date_found: (() => {
+          const dateVal = document.getElementById("item-date").value;
+          const parsed = dateVal ? new Date(dateVal) : new Date();
+          return firebase.firestore.Timestamp.fromDate(
+            isNaN(parsed.getTime()) ? new Date() : parsed
+          );
+        })(),
         status:
           document.getElementById("item-status-field").value || "available",
         uploaded_by: auth.currentUser.email,
@@ -721,15 +733,17 @@
       adminClaims = await ClaimsDB.getAll();
 
       const itemTitles = {};
-      const itemIds = [...new Set(adminClaims.map((c) => c.item_id))];
-      for (const id of itemIds) {
-        try {
-          const item = await ItemsDB.getById(id);
-          itemTitles[id] = item ? item.title : "Deleted Item";
-        } catch {
-          itemTitles[id] = "Unknown";
-        }
-      }
+      const itemIds = [...new Set(adminClaims.map((c) => c.item_id).filter(id => id))];
+      const items = await Promise.all(
+        itemIds.map((id) =>
+          ItemsDB.getById(id)
+            .then((item) => (item ? item.title : "Deleted Item"))
+            .catch(() => "Unknown")
+        )
+      );
+      itemIds.forEach((id, index) => {
+        itemTitles[id] = items[index];
+      });
 
       if (adminClaims.length === 0) {
         tableBody.innerHTML = "";
@@ -776,7 +790,14 @@
         .join("");
     } catch (err) {
       console.error("Failed to load claims:", err);
-      Toast.error("Error", "Failed to load claims.");
+      const errMessage = err.code === "permission-denied"
+        ? "Access Denied: You do not have permission to view claims."
+        : "Failed to load claims.";
+      Toast.error("Error", errMessage);
+      tableBody.innerHTML = `<tr><td colspan="6" class="adm-table-empty" style="color:var(--danger)">${errMessage}</td></tr>`;
+      if (err.code === "permission-denied") {
+        AuthHelper.logout();
+      }
     }
   }
 
@@ -885,7 +906,14 @@
         .join("");
     } catch (err) {
       console.error("Failed to load reports:", err);
-      Toast.error("Error", "Failed to load lost reports.");
+      const errMessage = err.code === "permission-denied"
+        ? "Access Denied: You do not have permission to view lost reports."
+        : "Failed to load lost reports.";
+      Toast.error("Error", errMessage);
+      tableBody.innerHTML = `<tr><td colspan="6" class="adm-table-empty" style="color:var(--danger)">${errMessage}</td></tr>`;
+      if (err.code === "permission-denied") {
+        AuthHelper.logout();
+      }
     }
   }
 
